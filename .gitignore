@@ -1,0 +1,13 @@
+# Environments
+venv/
+env/
+.env
+.venv
+__pycache__/
+
+# Checkpoints
+.ipynb_checkpoints/
+
+# System
+.DS_Store
+Thumbs.db

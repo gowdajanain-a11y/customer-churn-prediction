@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Churn Prediction Result</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    
+    <!-- Animate.css for Animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
+    <!-- Chart.js for Donut Chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #4a148c);
+            font-family: 'Poppins', sans-serif;
+            color: #ffffff;
+            min-height: 100vh;
+            padding-top: 20px;
+            text-align: center;
+        }
+        .result-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1.5s ease-in-out;
+        }
+        h1 {
+            color: #00d2d3;
+            font-weight: 700;
+            font-style: italic;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+        }
+        .chart-container {
+            width: 300px;
+            height: 300px;
+            margin: 20px auto;
+        }
+        .image-container img {
+            max-width: 200px;
+            margin-top: 20px;
+            border-radius: 15px; /* Rounded corners for sticker effect */
+            border: 5px solid #ffffff; /* White border for sticker look */
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5); /* Enhanced shadow */
+            animation: bounceIn 1s ease-out;
+            background: #ffffff; /* White background to mimic sticker */
+            padding: 5px; /* Inner padding for a lifted effect */
+        }
+        .image-container .error-img {
+            border: 2px solid #ff0000;
+        }
+        p {
+            font-size: 1.2em;
+            color: #ffffff;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes bounceIn {
+            from, 20%, 40%, 60%, 80%, to { animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000); }
+            0% { opacity: 0; transform: scale3d(.3, .3, .3); }
+            20% { transform: scale3d(1.1, 1.1, 1.1); }
+            40% { transform: scale3d(.9, .9, .9); }
+            60% { opacity: 1; transform: scale3d(1.03, 1.03, 1.03); }
+            80% { transform: scale3d(.97, .97, .97); }
+            to { opacity: 1; transform: scale3d(1, 1, 1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="result-container">
+        <h1>Churn Prediction Result</h1>
+        <div class="chart-container">
+            <canvas id="churnChart"></canvas>
+        </div>
+        <p>{{ prediction_text }}</p>
+        <p>Confidence: {{ confidence }}%</p>
+        <div class="image-container">
+            {% if "continue" in prediction_text %}
+                <img src="{{ url_for('static', filename='happycustomer.jpg') }}" alt="Happy Customer" 
+                     onerror="this.className='error-img'; this.src='https://via.placeholder.com/200x200.png?text=Image+Not+Found'">
+            {% else %}
+                <img src="{{ url_for('static', filename='sad.jpg') }}" alt="Sad Customer" 
+                     onerror="this.className='error-img'; this.src='https://via.placeholder.com/200x200.png?text=Image+Not+Found'">
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Donut Chart Data
+        const ctx = document.getElementById('churnChart').getContext('2d');
+        const confidence = {{ confidence }}; // Churn probability percentage
+        const noChurnConfidence = 100 - confidence; // No churn probability
+
+        const churnChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Churn Probability', 'No Churn Probability'],
+                datasets: [{
+                    data: [confidence, noChurnConfidence],
+                    backgroundColor: ['#1E90FF', '#ADD8E6'], // Dark blue and light blue from the image
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    animateScale: true,
+                    animateRotate: true
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            color: '#ffffff',
+                            font: { size: 14 }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return `${tooltipItem.label}: ${tooltipItem.raw}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

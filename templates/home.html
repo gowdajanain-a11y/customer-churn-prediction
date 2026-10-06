@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telecom Churn Prediction</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    
+    <!-- Animate.css for Animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <!-- Custom CSS with Gradient and Design -->
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #4a148c);
+            font-family: 'Poppins', sans-serif;
+            color: #ffffff;
+            min-height: 100vh;
+            padding-top: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        .content {
+            animation: fadeIn 1.5s ease-in-out;
+        }
+        .header {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+            animation: bounceIn 1s ease-out;
+        }
+        .header h1 {
+            font-size: 2.8em;
+            color: #00d2d3; /* Changed to match OnlineBackup label color (neon cyan) */
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+            font-weight: 700; /* Bold font weight */
+            font-style: italic; /* Added italic style */
+        }
+        .form-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px; /* Space between cards */
+            padding: 20px;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            animation: zoomIn 1s ease-in;
+            transition: transform 0.3s;
+            margin-bottom: 20px; /* Vertical space between cards */
+        }
+        .card:hover {
+            transform: scale(1.05);
+        }
+        .card label {
+            font-size: 1.1em;
+            color: #00d2d3; /* Neon cyan */
+        }
+        .card textarea {
+            border: 2px solid #ff00ff; /* Neon magenta */
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            width: 100%; /* Ensure textarea takes full width */
+        }
+        .card textarea:focus {
+            border-color: #ab47bc;
+            box-shadow: 0 0 10px rgba(171, 71, 188, 0.5);
+            outline: none;
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #00d2d3, #ff00ff);
+            border: none;
+            padding: 15px 40px; /* Larger button */
+            font-size: 1.3em; /* Larger font */
+            transition: all 0.3s ease;
+            animation: pulse 1.5s infinite;
+            width: 200px; /* Fixed width */
+        }
+        .btn-primary:hover {
+            background: linear-gradient(90deg, #00b4b5, #e91e63);
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0, 210, 211, 0.4);
+        }
+        .button-container {
+            margin-top: 40px; /* Gap between last card and button */
+            text-align: center;
+        }
+        .error-message {
+            background: rgba(255, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            color: #ff0000;
+            text-align: center;
+            animation: slideInUp 1s ease-out;
+        }
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes bounceIn {
+            from, 20%, 40%, 60%, 80%, to { animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000); }
+            0% { opacity: 0; transform: scale3d(.3, .3, .3); }
+            20% { transform: scale3d(1.1, 1.1, 1.1); }
+            40% { transform: scale3d(.9, .9, .9); }
+            60% { opacity: 1; transform: scale3d(1.03, 1.03, 1.03); }
+            80% { transform: scale3d(.97, .97, .97); }
+            to { opacity: 1; transform: scale3d(1, 1, 1); }
+        }
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale3d(.3, .3, .3); }
+            50% { opacity: 1; }
+            to { transform: scale3d(1, 1, 1); }
+        }
+        @keyframes slideInUp {
+            from { transform: translate3d(0, 100%, 0); opacity: 0; }
+            to { transform: translate3d(0, 0, 0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <div class="container">
+            <div class="header">
+                <h1>Telecom Churn Prediction</h1>
+                <p class="lead">Enter customer details to predict churn probability!</p>
+            </div>
+
+            <div class="form-container">
+                {% if error %}
+                    <div class="error-message">{{ error }}</div>
+                {% endif %}
+                <form action="/" method="POST" class="needs-validation" novalidate>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card animate__animated">
+                                <label for="query1"><i class="fas fa-user"></i> SeniorCitizen (0 or 1):</label>
+                                <textarea class="form-control" rows="1" id="query1" name="query1" cols="5" required>{{query1}}</textarea>
+                                <div class="invalid-feedback">Please enter 0 or 1.</div>
+                            </div>
+                            <div class="card animate__animated">
+                                <label for="query2"><i class="fas fa-dollar-sign"></i> MonthlyCharges:</label>
+                                <textarea class="form-control" rows="1" id="query2" name="query2" cols="5" required>{{query2}}</textarea>
+                                <div class="invalid-feedback">Please enter a number.</div>
+                            </div>
+                            <div class="card animate__animated">
+                                <label for="query3"><i class="fas fa-money-bill-wave"></i> TotalCharges:</label>
+                                <textarea class="form-control" rows="1" id="query3" name="query3" cols="5" required>{{query3}}</textarea>
+                                <div class="invalid-feedback">Please enter a number.</div>
+                            </div>
+                            <div class="card animate__animated">
+                                <label for="query4"><i class="fas fa-venus-mars"></i> Gender (Male/Female):</label>
+                                <textarea class="form-control" rows="1" id="query4" name="query4" cols="5" required>{{query4}}</textarea>
+                                <div class="invalid-feedback">Please enter Male or Female.</div>
+                            </div>
+                            <div class="card animate__animated">
+                                <label for="query5"><i class="fas fa-users"></i> Partner (Yes/No):</label>
+                                <textarea class="form-control" rows="1" id="query5" name="query5" cols="5" required>{{query5}}</textarea>
+                                <div class="invalid-feedback">Please enter Yes or No.</div>
+                            </div>
+                            <div class="card animate__animated">
+                                <label for="query6"><i class="fas fa-child"></i> Dependents (Yes/No):</label>
+                                <textarea class="form-control" rows="1" id="query6" name="query6" cols="5" required>{{query6}}</textarea>
+                                <div class="invalid-feedback">Please enter Yes or No.</div>
+                            </div>
+                            <div class="card animate__animated">
+                                <label for="query7"><i class="fas fa-phone"></i> PhoneService (Yes/No):</label>
+                                <textarea class="form-control" rows="1" id="query7" name="query7" cols="5" required>{{query7}}</textarea>
+                                <div class="invalid-feedback">Please enter Yes or No.</div>
+                            </div>
+                            <div class="card animate__animated">
+                                <label for="query8"><i class="fas fa-phone-alt"></i> MultipleLines (Yes/No/No phone service):</label>
+                                <textarea class="form-control" rows="1" id="query8" name="query8" cols="5" required>{{query8}}</textarea>
+                                <div class="invalid-feedback">Please enter Yes, No, or No phone service.</div>
+                            </div>
+                            <div class="card animate__animated">
+                                <label for="query9"><i class="fas fa-globe"></i> InternetService (DSL/Fiber optic/No):</label>
+                                <textarea class="form-control" rows="1" id="query9" name="query9" cols="5" required>{{query9}}</textarea>
+                                <div class="invalid-feedback">Please enter DSL, Fiber optic, or No.</div>
+                            </div>
+                            <div class="card animate__animated">
+                                <label for="query10"><i class="fas fa-shield-alt"></i> OnlineSecurity (Yes/No/No internet service):</label>
+                                <textarea class="form-control" rows="1" id="query10" name="query10" cols="5" required>{{query10}}</textarea>
+                                <div class="invalid-feedback">Please enter Yes, No, or No internet service.</div>
+                            </div>
+                            <div class="card animate__animated">
+                                <label for="query11"><i class="fas fa-cloud"></i> OnlineBackup (Yes/No/No internet service):</label>
+                                <textarea class="form-control" rows="1" id="query11" name="query11" cols="5" required>{{query11}}</textarea>
+                                <div class="invalid-feedback">Please enter Yes, No, or No internet service.</div>
+                            </div>
+                            <div class="card animate__animated">
+                                <label for="query12"><i class="fas fa-lock"></i> DeviceProtection (Yes/No/No internet service):</label>
+                                <textarea class="form-control" rows="1" id="query12" name="query12" cols="5" required>{{query12}}</textarea>
+                                <div class="invalid-feedback">Please enter Yes, No, or No internet service.</div>
+                            </div>
+                            <div class="card animate__animated">
+                                <label for="query13"><i class="fas fa-headset"></i> TechSupport (Yes/No/No internet service):</label>
+                                <textarea class="form-control" rows="1" id="query13" name="query13" cols="5" required>{{query13}}</textarea>
+                                <div class="invalid-feedback">Please enter Yes, No, or No internet service.</div>
+                            </div>
+                            <div class="card animate__animated">
+                                <label for="query14"><i class="fas fa-tv"></i> StreamingTV (Yes/No/No internet service):</label>
+                                <textarea class="form-control" rows="1" id="query14" name="query14" cols="5" required>{{query14}}</textarea>
+                                <div class="invalid-feedback">Please enter Yes, No, or No internet service.</div>
+                            </div>
+                            <div class="card animate__animated">
+                                <label for="query15"><i class="fas fa-film"></i> StreamingMovies (Yes/No/No internet service):</label>
+                                <textarea class="form-control" rows="1" id="query15" name="query15" cols="5" required>{{query15}}</textarea>
+                                <div class="invalid-feedback">Please enter Yes, No, or No internet service.</div>
+                            </div>
+                            <div class="card animate__animated">
+                                <label for="query16"><i class="fas fa-file-contract"></i> Contract (Month-to-month/One year/Two year):</label>
+                                <textarea class="form-control" rows="1" id="query16" name="query16" cols="5" required>{{query16}}</textarea>
+                                <div class="invalid-feedback">Please enter Month-to-month, One year, or Two year.</div>
+                            </div>
+                            <div class="card animate__animated">
+                                <label for="query17"><i class="fas fa-paper-plane"></i> PaperlessBilling (Yes/No):</label>
+                                <textarea class="form-control" rows="1" id="query17" name="query17" cols="5" required>{{query17}}</textarea>
+                                <div class="invalid-feedback">Please enter Yes or No.</div>
+                            </div>
+                            <div class="card animate__animated">
+                                <label for="query18"><i class="fas fa-credit-card"></i> PaymentMethod (Electronic check/Mailed check/Bank transfer (automatic)/Credit card (automatic)):</label>
+                                <textarea class="form-control" rows="1" id="query18" name="query18" cols="5" required>{{query18}}</textarea>
+                                <div class="invalid-feedback">Please enter a valid payment method.</div>
+                            </div>
+                            <div class="card animate__animated">
+                                <label for="query19"><i class="fas fa-calendar-alt"></i> Tenure:</label>
+                                <textarea class="form-control" rows="1" id="query19" name="query19" cols="5" required>{{query19}}</textarea>
+                                <div class="invalid-feedback">Please enter a number.</div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="button-container">
+                                <button type="submit" class="btn btn-primary animate__animated"><i class="fas fa-play"></i> Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <!-- Custom Validation -->
+    <script>
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
+</body>
+</html>
