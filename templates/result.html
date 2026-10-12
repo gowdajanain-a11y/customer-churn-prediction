@@ -89,10 +89,10 @@
             animation: growBar 1.2s ease-out;
         }
         .risk-up {
-            background: linear-gradient(90deg, #ff5e5e, #ff0000);
+            background: linear-gradient(90deg, #00d2d3, #00ff85);
         }
         .risk-down {
-            background: linear-gradient(90deg, #00d2d3, #00ff85);
+            background: linear-gradient(90deg, #ff5e5e, #ff0000);
         }
         .importance-container .subtext {
             text-align: center;
@@ -143,15 +143,16 @@
         <div class="importance-container">
             <h3>Why this customer specifically?</h3>
             <p class="subtext">Compared to the average customer's churn rate of {{ overall_rate }}%</p>
-            {% for label, diff in explanation %}
+                        {% for label, diff in explanation %}
+            {% set shown = 0 - diff %}
             <div class="importance-row">
                 <div class="importance-label">
                     <span>{{ label }}</span>
-                    <span>{{ '+' if diff > 0 else '' }}{{ diff }} pts</span>
+                    <span>{{ '+' if shown > 0 else '' }}{{ shown }} pts</span>
                 </div>
                 <div class="importance-bar-bg">
-                    <div class="importance-bar-fill {{ 'risk-up' if diff > 0 else 'risk-down' }}"
-                         style="width: {{ [diff|abs * 2, 100]|min }}%;"></div>
+                    <div class="importance-bar-fill {{ 'risk-up' if shown > 0 else 'risk-down' }}"
+                         style="width: {{ [shown|abs * 2, 100]|min }}%;"></div>
                 </div>
             </div>
             {% endfor %}
